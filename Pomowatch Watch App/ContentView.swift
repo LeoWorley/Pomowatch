@@ -1,11 +1,30 @@
 import SwiftUI
 
+enum Status {
+    case focus
+    case shortBreak
+    case longBreak
+    
+    var description: String {
+            switch self {
+            case .focus:
+                return "Focus"
+            case .shortBreak:
+                return "Short Break"
+            case .longBreak:
+                return "Long Break"
+            }
+        }
+}
+
 struct ContentView: View {
     @State private var timer: Timer?
     @State private var timeRemaining = 1500 // 25 minutes in seconds
     @State private var isRunning = false
     @State private var isShowingSettings = false // State to track if settings screen is visible
-    @State private var isRestTime = false // State to track if it's rest time
+    @State private var status: Status = .focus
+    @State private var count = 0
+    
     
     var body: some View {
         NavigationView {
@@ -18,14 +37,24 @@ struct ContentView: View {
                                 if timeRemaining > 0 {
                                     timeRemaining -= 1
                                 } else {
-                                    if isRestTime {
-                                        // Handle rest time logic here
-                                        timeRemaining = 300 // 5 minutes rest time
-                                        isRestTime = false
-                                    } else {
-                                        // Start rest time when the timer reaches 0
+                                    switch status {
+                                    case .focus:
+                                        // Handle focus time logic here
                                         timeRemaining = 1500 // 25 minutes work time
-                                        isRestTime = true
+                                        status = .shortBreak
+                                    case .shortBreak:
+                                        // Handle short break time logic here
+                                        timeRemaining = 300 // 5 minutes short break
+                                        if count == 4 {
+                                            status = .longBreak
+                                        } else {
+                                            count += 1
+                                            status = .focus
+                                        }
+                                    case .longBreak:
+                                        // Handle long break time logic here
+                                        timeRemaining = 900 // 15 minutes long break
+                                        status = .focus
                                     }
                                 }
                             }
@@ -47,9 +76,24 @@ struct ContentView: View {
                         .cornerRadius(10)
                 }
                 
-                NavigationLink("", destination: SettingsView(timeRemaining: $timeRemaining), isActive: $isShowingSettings)
-                    .opacity(0) // Hide the link, but still use it to control navigation
+                Button(action: {
+                    // Toggle between the three status enums
+                    switch status {
+                    case .focus:
+                        status = .shortBreak
+                    case .shortBreak:
+                        status = .longBreak
+                    case .longBreak:
+                        status = .focus
+                    }
+                }) {
+                    Text("Status: \(status.description)") // Display the current status
+                }
                 
+                NavigationLink("", destination: SettingsView(timeRemaining: $timeRemaining), isActive: $isShowingSettings)
+                    .opacity(0)
+                    .buttonStyle(PlainButtonStyle()) // This makes the link not look like a button
+
                 Button(action: {
                     isShowingSettings = true // Show settings screen when button is tapped
                 }) {
@@ -61,8 +105,6 @@ struct ContentView: View {
                         .cornerRadius(10)
                 }
             }
-            .padding()
-            .navigationBarTitle("Pomowatch")
         }
     }
     
