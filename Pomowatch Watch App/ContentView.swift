@@ -17,6 +17,12 @@ enum Status {
         }
 }
 
+struct times {
+    var focus = 25 * 60
+    var shortBreak = 5 * 60
+    var longBreak = 15 * 60
+}
+
 struct ContentView: View {
     @State private var timer: Timer?
     @State private var timeRemaining = 1500 // 25 minutes in seconds
@@ -36,26 +42,6 @@ struct ContentView: View {
                             if isRunning {
                                 if timeRemaining > 0 {
                                     timeRemaining -= 1
-                                } else {
-                                    switch status {
-                                    case .focus:
-                                        // Handle focus time logic here
-                                        timeRemaining = 1500 // 25 minutes work time
-                                        status = .shortBreak
-                                    case .shortBreak:
-                                        // Handle short break time logic here
-                                        timeRemaining = 300 // 5 minutes short break
-                                        if count == 4 {
-                                            status = .longBreak
-                                        } else {
-                                            count += 1
-                                            status = .focus
-                                        }
-                                    case .longBreak:
-                                        // Handle long break time logic here
-                                        timeRemaining = 900 // 15 minutes long break
-                                        status = .focus
-                                    }
                                 }
                             }
                         }
@@ -77,14 +63,18 @@ struct ContentView: View {
                 }
                 
                 Button(action: {
+                    if isRunning { stopTimer() }
                     // Toggle between the three status enums
                     switch status {
                     case .focus:
                         status = .shortBreak
+                        timeRemaining = times().focus
                     case .shortBreak:
                         status = .longBreak
+                        timeRemaining = times().shortBreak
                     case .longBreak:
                         status = .focus
+                        timeRemaining = times().longBreak
                     }
                 }) {
                     Text("Status: \(status.description)") // Display the current status
