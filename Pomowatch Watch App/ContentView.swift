@@ -38,19 +38,18 @@ struct ContentView: View {
                         if timeRemaining == 0 {
                             timeRemaining = times.focus
                         }
-                        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                            if isRunning {
-                                if timeRemaining > 0 {
-                                    timeRemaining -= 1
-                                }
-                            }
-                        }
+                        startTimerIfNeeded()
+                    })
+                    .onDisappear(perform: {
+                        // Clean up timer when view disappears to prevent memory leaks
+                        invalidateTimer()
                     })
                 
                 Button(action: {
                     if isRunning {
                         stopTimer()
                     } else {
+                        startTimerIfNeeded()
                         startTimer()
                     }
                 }) {
@@ -63,7 +62,10 @@ struct ContentView: View {
                 }
                 
                 Button(action: {
-                    if isRunning { stopTimer() }
+                    if isRunning { 
+                        stopTimer()
+                        invalidateTimer()
+                    }
                     // Toggle between the three status enums
                     switch status {
                     case .focus:
@@ -76,6 +78,8 @@ struct ContentView: View {
                         status = .focus
                         timeRemaining = times.focus
                     }
+                    // Restart timer if it was running
+                    startTimerIfNeeded()
                 }) {
                     Text("Status: \(status.description)") // Display the current status
                 }
@@ -104,6 +108,22 @@ struct ContentView: View {
     
     private func stopTimer() {
         isRunning = false
+    }
+    
+    private func startTimerIfNeeded() {
+        // Only create a new timer if one doesn't already exist
+        guard timer == nil else { return }
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            if isRunning {
+                if timeRemaining > 0 {
+                    timeRemaining -= 1
+                }
+            }
+        }
+    }
+    
+    private func invalidateTimer() {
         timer?.invalidate()
         timer = nil
     }
