@@ -6,15 +6,48 @@ enum Status {
     case longBreak
     
     var description: String {
-            switch self {
-            case .focus:
-                return "Focus"
-            case .shortBreak:
-                return "Short Break"
-            case .longBreak:
-                return "Long Break"
-            }
+        switch self {
+        case .focus:
+            return "Focus"
+        case .shortBreak:
+            return "Short Break"
+        case .longBreak:
+            return "Long Break"
         }
+    }
+    
+    var color: Color {
+        switch self {
+        case .focus:
+            return .pomodoroRed
+        case .shortBreak:
+            return .pomodoroGreen
+        case .longBreak:
+            return .pomodoroBlue
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .focus:
+            return "brain.head.profile"
+        case .shortBreak:
+            return "cup.and.saucer"
+        case .longBreak:
+            return "bed.double"
+        }
+    }
+}
+
+// MARK: - Color Extensions
+extension Color {
+    static let pomodoroRed = Color(red: 0.95, green: 0.31, blue: 0.31)
+    static let pomodoroGreen = Color(red: 0.20, green: 0.78, blue: 0.35)
+    static let pomodoroBlue = Color(red: 0.20, green: 0.60, blue: 0.86)
+    static let darkBackground = Color(red: 0.05, green: 0.05, blue: 0.05)
+    static let cardBackground = Color(red: 0.12, green: 0.12, blue: 0.12)
+    static let textPrimary = Color.white
+    static let textSecondary = Color(red: 0.7, green: 0.7, blue: 0.7)
 }
 
 
@@ -42,113 +75,168 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 12) {
-                Text(timeString(from: timeRemaining))
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .onAppear(perform: {
-                        // Initialize timeRemaining with the current status time if not already set
-                        if timeRemaining == 0 {
-                            timeRemaining = currentStatusTime
-                        }
-                        startTimerIfNeeded()
-                    })
-                    .onDisappear(perform: {
-                        // Clean up timer when view disappears to prevent memory leaks
-                        invalidateTimer()
-                    })
-                    .onChange(of: times.focus) { _ in
-                        // Update timer if currently on focus and not running
-                        if status == .focus && !isRunning {
-                            timeRemaining = currentStatusTime
-                        }
-                    }
-                    .onChange(of: times.shortBreak) { _ in
-                        // Update timer if currently on short break and not running
-                        if status == .shortBreak && !isRunning {
-                            timeRemaining = currentStatusTime
-                        }
-                    }
-                    .onChange(of: times.longBreak) { _ in
-                        // Update timer if currently on long break and not running
-                        if status == .longBreak && !isRunning {
-                            timeRemaining = currentStatusTime
-                        }
-                    }
+            ZStack {
+                // Background gradient
+                LinearGradient(
+                    colors: [Color.darkBackground, Color.black],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
                 
-                Button(action: {
-                    if isRunning {
-                        stopTimer()
-                    } else {
-                        startTimerIfNeeded()
-                        startTimer()
-                    }
-                }) {
-                    Text(isRunning ? "Pause" : "Start")
-                        .font(.headline)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(Color.accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                
-                Button(action: {
-                    if isRunning { 
-                        stopTimer()
-                        invalidateTimer()
-                    }
-                    // Toggle between the three status enums
-                    switch status {
-                    case .focus:
-                        status = .shortBreak
-                    case .shortBreak:
-                        status = .longBreak
-                    case .longBreak:
-                        status = .focus
-                    }
-                    // Set time remaining to the new status time
-                    timeRemaining = currentStatusTime
-                    // Restart timer if it was running
-                    startTimerIfNeeded()
-                }) {
-                    Text("Status: \(status.description)")
-                        .font(.caption)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(6)
-                }
-                
-                NavigationLink("", destination: SettingsView(times: times), isActive: $isShowingSettings)
-                    .opacity(0)
-                    .buttonStyle(PlainButtonStyle()) // This makes the link not look like a button
-
-                HStack(spacing: 8) {
-                    Button(action: {
-                        isShowingSettings = true // Show settings screen when button is tapped
-                    }) {
-                        Text("Settings")
+                VStack(spacing: 20) {
+                    // Status indicator with icon
+                    VStack(spacing: 8) {
+                        Image(systemName: status.icon)
+                            .font(.title3)
+                            .foregroundColor(status.color)
+                        
+                        Text(status.description)
                             .font(.caption)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(6)
+                            .fontWeight(.medium)
+                            .foregroundColor(.textSecondary)
+                            .textCase(.uppercase)
+                            .tracking(1)
                     }
                     
-                    Button(action: {
-                        resetTimer()
-                    }) {
-                        Text("Reset")
-                            .font(.caption)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.red)
-                            .foregroundColor(.white)
-                            .cornerRadius(6)
+                    // Main timer display
+                    VStack(spacing: 4) {
+                        Text(timeString(from: timeRemaining))
+                            .font(.system(size: 32, weight: .ultraLight, design: .monospaced))
+                            .foregroundColor(.textPrimary)
+                        
+                        // Progress ring
+                        ProgressRing(
+                            progress: Double(currentStatusTime - timeRemaining) / Double(currentStatusTime),
+                            color: status.color
+                        )
+                        .frame(width: 80, height: 80)
                     }
+                    
+                    // Control buttons
+                    VStack(spacing: 12) {
+                        // Main action button
+                        Button(action: {
+                            if isRunning {
+                                stopTimer()
+                            } else {
+                                startTimerIfNeeded()
+                                startTimer()
+                            }
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                                    .font(.caption)
+                                Text(isRunning ? "Pause" : "Start")
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(
+                                LinearGradient(
+                                    colors: [status.color, status.color.opacity(0.8)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .cornerRadius(20)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        // Secondary actions
+                        HStack(spacing: 12) {
+                            // Status toggle button
+                            Button(action: {
+                                if isRunning { 
+                                    stopTimer()
+                                    invalidateTimer()
+                                }
+                                // Toggle between the three status enums
+                                switch status {
+                                case .focus:
+                                    status = .shortBreak
+                                case .shortBreak:
+                                    status = .longBreak
+                                case .longBreak:
+                                    status = .focus
+                                }
+                                // Set time remaining to the new status time
+                                timeRemaining = currentStatusTime
+                                // Restart timer if it was running
+                                startTimerIfNeeded()
+                            }) {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(.textSecondary)
+                                    .frame(width: 32, height: 32)
+                                    .background(Color.cardBackground)
+                                    .cornerRadius(16)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                            // Reset button
+                            Button(action: {
+                                resetTimer()
+                            }) {
+                                Image(systemName: "arrow.counterclockwise")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(.textSecondary)
+                                    .frame(width: 32, height: 32)
+                                    .background(Color.cardBackground)
+                                    .cornerRadius(16)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                            // Settings button
+                            Button(action: {
+                                isShowingSettings = true
+                            }) {
+                                Image(systemName: "gearshape")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(.textSecondary)
+                                    .frame(width: 32, height: 32)
+                                    .background(Color.cardBackground)
+                                    .cornerRadius(16)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                    
+                    NavigationLink("", destination: SettingsView(times: times), isActive: $isShowingSettings)
+                        .opacity(0)
+                        .buttonStyle(PlainButtonStyle())
                 }
+                .padding(.horizontal, 16)
+            }
+        }
+        .onAppear(perform: {
+            // Initialize timeRemaining with the current status time if not already set
+            if timeRemaining == 0 {
+                timeRemaining = currentStatusTime
+            }
+            startTimerIfNeeded()
+        })
+        .onDisappear(perform: {
+            // Clean up timer when view disappears to prevent memory leaks
+            invalidateTimer()
+        })
+        .onChange(of: times.focus) { _ in
+            // Update timer if currently on focus and not running
+            if status == .focus && !isRunning {
+                timeRemaining = currentStatusTime
+            }
+        }
+        .onChange(of: times.shortBreak) { _ in
+            // Update timer if currently on short break and not running
+            if status == .shortBreak && !isRunning {
+                timeRemaining = currentStatusTime
+            }
+        }
+        .onChange(of: times.longBreak) { _ in
+            // Update timer if currently on long break and not running
+            if status == .longBreak && !isRunning {
+                timeRemaining = currentStatusTime
             }
         }
     }
@@ -197,6 +285,34 @@ struct ContentView: View {
 }
 
 
+// MARK: - Progress Ring Component
+struct ProgressRing: View {
+    let progress: Double
+    let color: Color
+    
+    var body: some View {
+        ZStack {
+            // Background ring
+            Circle()
+                .stroke(Color.cardBackground, lineWidth: 3)
+            
+            // Progress ring
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(
+                    LinearGradient(
+                        colors: [color, color.opacity(0.6)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+                .animation(.easeInOut(duration: 0.5), value: progress)
+        }
+    }
+}
+
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
@@ -205,56 +321,167 @@ struct ContentView_Previews: PreviewProvider {
 
 struct SettingsView: View {
     @ObservedObject var times: Times
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 8) {
-                // Focus Time Section
-                VStack(spacing: 4) {
-                    Text("Focus")
-                        .font(.headline)
-                        .foregroundColor(.primary)
+        ZStack {
+            // Background gradient
+            LinearGradient(
+                colors: [Color.darkBackground, Color.black],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Custom header with back button
+                HStack {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.textPrimary)
+                            .frame(width: 32, height: 32)
+                            .background(Color.cardBackground)
+                            .cornerRadius(16)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                     
-                    Stepper("\(times.focus / 60) min", value: $times.focus, in: 60...3600, step: 60)
-                        .font(.caption)
+                    Spacer()
+                    
+                    Text("Settings")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.textPrimary)
+                    
+                    Spacer()
+                    
+                    // Invisible spacer to center the title
+                    Color.clear
+                        .frame(width: 32, height: 32)
                 }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(8)
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+                
+                // Settings content
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // Subtitle
+                        Text("Customize your Pomodoro intervals")
+                            .font(.caption)
+                            .foregroundColor(.textSecondary)
+                            .padding(.bottom, 8)
+                        
+                        // Focus Time Section
+                        SettingCard(
+                            title: "Focus Time",
+                            icon: "brain.head.profile",
+                            color: .pomodoroRed,
+                            value: $times.focus,
+                            range: 60...3600
+                        )
 
-                // Short Break Section
-                VStack(spacing: 4) {
-                    Text("Short Break")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    Stepper("\(times.shortBreak / 60) min", value: $times.shortBreak, in: 60...3600, step: 60)
-                        .font(.caption)
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(8)
+                        // Short Break Section
+                        SettingCard(
+                            title: "Short Break",
+                            icon: "cup.and.saucer",
+                            color: .pomodoroGreen,
+                            value: $times.shortBreak,
+                            range: 60...3600
+                        )
 
-                // Long Break Section
-                VStack(spacing: 4) {
-                    Text("Long Break")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    Stepper("\(times.longBreak / 60) min", value: $times.longBreak, in: 60...3600, step: 60)
-                        .font(.caption)
+                        // Long Break Section
+                        SettingCard(
+                            title: "Long Break",
+                            icon: "bed.double",
+                            color: .pomodoroBlue,
+                            value: $times.longBreak,
+                            range: 60...3600
+                        )
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
                 }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(8)
             }
-            .padding(.horizontal, 4)
-            .padding(.vertical, 8)
         }
-        .navigationTitle("Settings")
+        .navigationTitle("")
+        .navigationBarHidden(true)
+    }
+}
+
+// MARK: - Setting Card Component
+struct SettingCard: View {
+    let title: String
+    let icon: String
+    let color: Color
+    @Binding var value: Int
+    let range: ClosedRange<Int>
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            // Header with icon and title
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(color)
+                    .frame(width: 20, height: 20)
+                
+                Text(title)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.textPrimary)
+                
+                Spacer()
+                
+                Text("\(value / 60) min")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.textSecondary)
+            }
+            
+            // Custom stepper
+            HStack(spacing: 16) {
+                Button(action: {
+                    if value > range.lowerBound {
+                        value -= 60
+                    }
+                }) {
+                    Image(systemName: "minus")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(value > range.lowerBound ? color : .textSecondary)
+                        .frame(width: 28, height: 28)
+                        .background(Color.cardBackground)
+                        .cornerRadius(14)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .disabled(value <= range.lowerBound)
+                
+                Spacer()
+                
+                Button(action: {
+                    if value < range.upperBound {
+                        value += 60
+                    }
+                }) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(value < range.upperBound ? color : .textSecondary)
+                        .frame(width: 28, height: 28)
+                        .background(Color.cardBackground)
+                        .cornerRadius(14)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .disabled(value >= range.upperBound)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(color.opacity(0.2), lineWidth: 1)
+                )
+        )
     }
 }
 
