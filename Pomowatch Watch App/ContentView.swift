@@ -30,6 +30,7 @@ struct ContentView: View {
     @State private var isShowingSettings = false // State to track if settings screen is visible
     @State private var status: Status = .focus
     @State private var count = 0
+    @ObservedObject var times = Times()
     
     
     var body: some View {
@@ -68,19 +69,19 @@ struct ContentView: View {
                     switch status {
                     case .focus:
                         status = .shortBreak
-                        timeRemaining = times().focus
+                        timeRemaining = times.shortBreak
                     case .shortBreak:
                         status = .longBreak
-                        timeRemaining = times().shortBreak
+                        timeRemaining = times.longBreak
                     case .longBreak:
                         status = .focus
-                        timeRemaining = times().longBreak
+                        timeRemaining = times.focus
                     }
                 }) {
                     Text("Status: \(status.description)") // Display the current status
                 }
                 
-                NavigationLink("", destination: SettingsView(timeRemaining: $timeRemaining), isActive: $isShowingSettings)
+                NavigationLink("", destination: SettingsView(times: times), isActive: $isShowingSettings)
                     .opacity(0)
                     .buttonStyle(PlainButtonStyle()) // This makes the link not look like a button
 
@@ -123,17 +124,42 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 struct SettingsView: View {
-    @Binding var timeRemaining: Int
-    
+    @ObservedObject var times: Times
+
     var body: some View {
         VStack {
             Text("Focus time")
                 .font(.largeTitle)
                 .padding()
             
-            Stepper("\(timeRemaining / 60)", value: $timeRemaining, in: 60...3600, step: 60)
+            Stepper("\(times.focus / 60) minutes", value: $times.focus, in: 60...3600, step: 60)
+                .padding()
+
+            Text("Short break")
+                .font(.largeTitle)
+                .padding()
+            
+            Stepper("\(times.shortBreak / 60) minutes", value: $times.shortBreak, in: 60...3600, step: 60)
+                .padding()
+
+            Text("Long break")
+                .font(.largeTitle)
+                .padding()
+            
+            Stepper("\(times.longBreak / 60) minutes", value: $times.longBreak, in: 60...3600, step: 60)
                 .padding()
         }
         .navigationBarTitle("Settings").fixedSize()
     }
 }
+
+class Times: ObservableObject {
+    @Published var focus = 25 * 60
+    @Published var shortBreak = 5 * 60
+    @Published var longBreak = 15 * 60
+}
+
+
+
+
+
