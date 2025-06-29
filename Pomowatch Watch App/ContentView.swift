@@ -20,12 +20,24 @@ enum Status {
 
 struct ContentView: View {
     @State private var timer: Timer?
-    @State private var timeRemaining = 0 // Will be initialized from times.focus
+    @State private var timeRemaining = 0 // Will be properly initialized based on current status
     @State private var isRunning = false
     @State private var isShowingSettings = false // State to track if settings screen is visible
     @State private var status: Status = .focus
     @State private var count = 0
     @ObservedObject var times = Times()
+    
+    // Computed property to get the correct time for current status
+    private var currentStatusTime: Int {
+        switch status {
+        case .focus:
+            return times.focus
+        case .shortBreak:
+            return times.shortBreak
+        case .longBreak:
+            return times.longBreak
+        }
+    }
     
     
     var body: some View {
@@ -34,9 +46,9 @@ struct ContentView: View {
                 Text(timeString(from: timeRemaining))
                     .font(.largeTitle)
                     .onAppear(perform: {
-                        // Initialize timeRemaining with the current status time
+                        // Initialize timeRemaining with the current status time if not already set
                         if timeRemaining == 0 {
-                            timeRemaining = times.focus
+                            timeRemaining = currentStatusTime
                         }
                         startTimerIfNeeded()
                     })
@@ -44,6 +56,24 @@ struct ContentView: View {
                         // Clean up timer when view disappears to prevent memory leaks
                         invalidateTimer()
                     })
+                    .onChange(of: times.focus) { _ in
+                        // Update timer if currently on focus and not running
+                        if status == .focus && !isRunning {
+                            timeRemaining = currentStatusTime
+                        }
+                    }
+                    .onChange(of: times.shortBreak) { _ in
+                        // Update timer if currently on short break and not running
+                        if status == .shortBreak && !isRunning {
+                            timeRemaining = currentStatusTime
+                        }
+                    }
+                    .onChange(of: times.longBreak) { _ in
+                        // Update timer if currently on long break and not running
+                        if status == .longBreak && !isRunning {
+                            timeRemaining = currentStatusTime
+                        }
+                    }
                 
                 Button(action: {
                     if isRunning {
@@ -70,14 +100,13 @@ struct ContentView: View {
                     switch status {
                     case .focus:
                         status = .shortBreak
-                        timeRemaining = times.shortBreak
                     case .shortBreak:
                         status = .longBreak
-                        timeRemaining = times.longBreak
                     case .longBreak:
                         status = .focus
-                        timeRemaining = times.focus
                     }
+                    // Set time remaining to the new status time
+                    timeRemaining = currentStatusTime
                     // Restart timer if it was running
                     startTimerIfNeeded()
                 }) {
@@ -88,15 +117,28 @@ struct ContentView: View {
                     .opacity(0)
                     .buttonStyle(PlainButtonStyle()) // This makes the link not look like a button
 
-                Button(action: {
-                    isShowingSettings = true // Show settings screen when button is tapped
-                }) {
-                    Text("Settings")
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                HStack {
+                    Button(action: {
+                        isShowingSettings = true // Show settings screen when button is tapped
+                    }) {
+                        Text("Settings")
+                            .padding(.horizontal, 15)
+                            .padding(.vertical, 10)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    
+                    Button(action: {
+                        resetTimer()
+                    }) {
+                        Text("Reset")
+                            .padding(.horizontal, 15)
+                            .padding(.vertical, 10)
+                            .background(Color.red)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                 }
             }
         }
@@ -126,6 +168,16 @@ struct ContentView: View {
     private func invalidateTimer() {
         timer?.invalidate()
         timer = nil
+    }
+    
+    private func resetTimer() {
+        // Stop the timer if running
+        if isRunning {
+            stopTimer()
+            invalidateTimer()
+        }
+        // Reset time to current status time
+        timeRemaining = currentStatusTime
     }
     
     private func timeString(from seconds: Int) -> String {

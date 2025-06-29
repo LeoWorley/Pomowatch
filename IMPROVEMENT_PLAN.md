@@ -48,11 +48,11 @@ Pomowatch is a Pomodoro timer Apple Watch app built with SwiftUI. This document 
 - [x] **Files**: `ContentView.swift`
 - [x] **Impact**: Prevents memory leaks and improper timer behavior
 
-#### 1.4 Fix Initial Timer State
-- [ ] **Issue**: `timeRemaining` hardcoded to 1500 instead of using settings
-- [ ] **Solution**: Initialize `timeRemaining` from `Times` object
-- [ ] **Files**: `ContentView.swift`
-- [ ] **Impact**: Ensures timer respects user settings from start
+#### 1.4 Fix Initial Timer State ✅ COMPLETED
+- [x] **Issue**: `timeRemaining` hardcoded to 1500 instead of using settings
+- [x] **Solution**: Initialize `timeRemaining` from `Times` object
+- [x] **Files**: `ContentView.swift`
+- [x] **Impact**: Ensures timer respects user settings from start
 
 ### Phase 2: Core Feature Enhancements (Priority: HIGH)
 **Timeline: 3-5 days**
