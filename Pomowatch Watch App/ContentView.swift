@@ -42,9 +42,10 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
+            VStack(spacing: 12) {
                 Text(timeString(from: timeRemaining))
-                    .font(.largeTitle)
+                    .font(.title2)
+                    .fontWeight(.bold)
                     .onAppear(perform: {
                         // Initialize timeRemaining with the current status time if not already set
                         if timeRemaining == 0 {
@@ -84,11 +85,12 @@ struct ContentView: View {
                     }
                 }) {
                     Text(isRunning ? "Pause" : "Start")
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
+                        .font(.headline)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
                         .background(Color.accentColor)
                         .foregroundColor(.white)
-                        .cornerRadius(10)
+                        .cornerRadius(8)
                 }
                 
                 Button(action: {
@@ -110,34 +112,41 @@ struct ContentView: View {
                     // Restart timer if it was running
                     startTimerIfNeeded()
                 }) {
-                    Text("Status: \(status.description)") // Display the current status
+                    Text("Status: \(status.description)")
+                        .font(.caption)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(6)
                 }
                 
                 NavigationLink("", destination: SettingsView(times: times), isActive: $isShowingSettings)
                     .opacity(0)
                     .buttonStyle(PlainButtonStyle()) // This makes the link not look like a button
 
-                HStack {
+                HStack(spacing: 8) {
                     Button(action: {
                         isShowingSettings = true // Show settings screen when button is tapped
                     }) {
                         Text("Settings")
-                            .padding(.horizontal, 15)
-                            .padding(.vertical, 10)
+                            .font(.caption)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
                             .background(Color.blue)
                             .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .cornerRadius(6)
                     }
                     
                     Button(action: {
                         resetTimer()
                     }) {
                         Text("Reset")
-                            .padding(.horizontal, 15)
-                            .padding(.vertical, 10)
+                            .font(.caption)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
                             .background(Color.red)
                             .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .cornerRadius(6)
                     }
                 }
             }
@@ -198,29 +207,54 @@ struct SettingsView: View {
     @ObservedObject var times: Times
 
     var body: some View {
-        VStack {
-            Text("Focus time")
-                .font(.largeTitle)
-                .padding()
-            
-            Stepper("\(times.focus / 60) minutes", value: $times.focus, in: 60...3600, step: 60)
-                .padding()
+        ScrollView {
+            VStack(spacing: 8) {
+                // Focus Time Section
+                VStack(spacing: 4) {
+                    Text("Focus")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    Stepper("\(times.focus / 60) min", value: $times.focus, in: 60...3600, step: 60)
+                        .font(.caption)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
 
-            Text("Short break")
-                .font(.largeTitle)
-                .padding()
-            
-            Stepper("\(times.shortBreak / 60) minutes", value: $times.shortBreak, in: 60...3600, step: 60)
-                .padding()
+                // Short Break Section
+                VStack(spacing: 4) {
+                    Text("Short Break")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    Stepper("\(times.shortBreak / 60) min", value: $times.shortBreak, in: 60...3600, step: 60)
+                        .font(.caption)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
 
-            Text("Long break")
-                .font(.largeTitle)
-                .padding()
-            
-            Stepper("\(times.longBreak / 60) minutes", value: $times.longBreak, in: 60...3600, step: 60)
-                .padding()
+                // Long Break Section
+                VStack(spacing: 4) {
+                    Text("Long Break")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    Stepper("\(times.longBreak / 60) min", value: $times.longBreak, in: 60...3600, step: 60)
+                        .font(.caption)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+            }
+            .padding(.horizontal, 4)
+            .padding(.vertical, 8)
         }
-        .navigationBarTitle("Settings").fixedSize()
+        .navigationTitle("Settings")
     }
 }
 

@@ -54,6 +54,12 @@ Pomowatch is a Pomodoro timer Apple Watch app built with SwiftUI. This document 
 - [x] **Files**: `ContentView.swift`
 - [x] **Impact**: Ensures timer respects user settings from start
 
+#### 1.5 Fix Settings Screen Layout ✅ COMPLETED
+- [x] **Issue**: Settings text too large, no scrolling, content cut off on Apple Watch
+- [x] **Solution**: Optimize fonts, add ScrollView, reduce padding, improve layout
+- [x] **Files**: `ContentView.swift`
+- [x] **Impact**: Settings screen now usable on Apple Watch with proper scrolling
+
 ### Phase 2: Core Feature Enhancements (Priority: HIGH)
 **Timeline: 3-5 days**
 
