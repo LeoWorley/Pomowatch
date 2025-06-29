@@ -17,15 +17,10 @@ enum Status {
         }
 }
 
-struct times {
-    var focus = 25 * 60
-    var shortBreak = 5 * 60
-    var longBreak = 15 * 60
-}
 
 struct ContentView: View {
     @State private var timer: Timer?
-    @State private var timeRemaining = 1500 // 25 minutes in seconds
+    @State private var timeRemaining = 0 // Will be initialized from times.focus
     @State private var isRunning = false
     @State private var isShowingSettings = false // State to track if settings screen is visible
     @State private var status: Status = .focus
@@ -39,6 +34,10 @@ struct ContentView: View {
                 Text(timeString(from: timeRemaining))
                     .font(.largeTitle)
                     .onAppear(perform: {
+                        // Initialize timeRemaining with the current status time
+                        if timeRemaining == 0 {
+                            timeRemaining = times.focus
+                        }
                         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                             if isRunning {
                                 if timeRemaining > 0 {

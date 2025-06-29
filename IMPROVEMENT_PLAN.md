@@ -36,11 +36,11 @@ Pomowatch is a Pomodoro timer Apple Watch app built with SwiftUI. This document 
 - [x] **Files**: `ContentView.swift`
 - [x] **Impact**: Fixes core functionality
 
-#### 1.2 Resolve Conflicting Timer Objects
-- [ ] **Issue**: Both `times` struct (line 19) and `Times` class (line 155) exist
-- [ ] **Solution**: Remove unused `times` struct, use only `Times` class
-- [ ] **Files**: `ContentView.swift`
-- [ ] **Impact**: Eliminates confusion and potential bugs
+#### 1.2 Resolve Conflicting Timer Objects ✅ COMPLETED
+- [x] **Issue**: Both `times` struct (line 19) and `Times` class (line 155) exist
+- [x] **Solution**: Remove unused `times` struct, use only `Times` class
+- [x] **Files**: `ContentView.swift`
+- [x] **Impact**: Eliminates confusion and potential bugs
 
 #### 1.3 Fix Timer Lifecycle Management
 - [ ] **Issue**: Timer may not be properly invalidated, causing memory leaks
