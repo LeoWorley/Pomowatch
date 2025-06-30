@@ -15,6 +15,12 @@
 		801E3C812A9C657C0049CC7E /* Pomowatch_Watch_AppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801E3C802A9C657C0049CC7E /* Pomowatch_Watch_AppTests.swift */; };
 		801E3C8B2A9C657C0049CC7E /* Pomowatch_Watch_AppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801E3C8A2A9C657C0049CC7E /* Pomowatch_Watch_AppUITests.swift */; };
 		801E3C8D2A9C657C0049CC7E /* Pomowatch_Watch_AppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801E3C8C2A9C657C0049CC7E /* Pomowatch_Watch_AppUITestsLaunchTests.swift */; };
+		804F54F92E1209FE00B14773 /* Times.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F54F72E1209FE00B14773 /* Times.swift */; };
+		804F54FA2E1209FE00B14773 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F54F62E1209FE00B14773 /* Status.swift */; };
+		804F54FD2E120A0900B14773 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F54FB2E120A0900B14773 /* Color+Extensions.swift */; };
+		804F55012E120A1700B14773 /* ProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F54FE2E120A1700B14773 /* ProgressRing.swift */; };
+		804F55022E120A1700B14773 /* SettingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F54FF2E120A1700B14773 /* SettingCard.swift */; };
+		804F55052E120A2500B14773 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F55032E120A2500B14773 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +73,12 @@
 		801E3C862A9C657C0049CC7E /* Pomowatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Pomowatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		801E3C8A2A9C657C0049CC7E /* Pomowatch_Watch_AppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pomowatch_Watch_AppUITests.swift; sourceTree = "<group>"; };
 		801E3C8C2A9C657C0049CC7E /* Pomowatch_Watch_AppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pomowatch_Watch_AppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		804F54F62E1209FE00B14773 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
+		804F54F72E1209FE00B14773 /* Times.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Times.swift; sourceTree = "<group>"; };
+		804F54FB2E120A0900B14773 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		804F54FE2E120A1700B14773 /* ProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRing.swift; sourceTree = "<group>"; };
+		804F54FF2E120A1700B14773 /* SettingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCard.swift; sourceTree = "<group>"; };
+		804F55032E120A2500B14773 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +130,10 @@
 		801E3C6E2A9C657B0049CC7E /* Pomowatch Watch App */ = {
 			isa = PBXGroup;
 			children = (
+				804F55042E120A2500B14773 /* Views */,
+				804F55002E120A1700B14773 /* Components */,
+				804F54FC2E120A0900B14773 /* Extensions */,
+				804F54F82E1209FE00B14773 /* Models */,
 				801E3C6F2A9C657B0049CC7E /* PomowatchApp.swift */,
 				801E3C712A9C657B0049CC7E /* ContentView.swift */,
 				801E3C732A9C657C0049CC7E /* Assets.xcassets */,
@@ -149,6 +165,40 @@
 				801E3C8C2A9C657C0049CC7E /* Pomowatch_Watch_AppUITestsLaunchTests.swift */,
 			);
 			path = "Pomowatch Watch AppUITests";
+			sourceTree = "<group>";
+		};
+		804F54F82E1209FE00B14773 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				804F54F62E1209FE00B14773 /* Status.swift */,
+				804F54F72E1209FE00B14773 /* Times.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		804F54FC2E120A0900B14773 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				804F54FB2E120A0900B14773 /* Color+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		804F55002E120A1700B14773 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				804F54FE2E120A1700B14773 /* ProgressRing.swift */,
+				804F54FF2E120A1700B14773 /* SettingCard.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		804F55042E120A2500B14773 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				804F55032E120A2500B14773 /* SettingsView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -309,7 +359,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				804F54FD2E120A0900B14773 /* Color+Extensions.swift in Sources */,
+				804F55052E120A2500B14773 /* SettingsView.swift in Sources */,
 				801E3C722A9C657B0049CC7E /* ContentView.swift in Sources */,
+				804F55012E120A1700B14773 /* ProgressRing.swift in Sources */,
+				804F55022E120A1700B14773 /* SettingCard.swift in Sources */,
+				804F54F92E1209FE00B14773 /* Times.swift in Sources */,
+				804F54FA2E1209FE00B14773 /* Status.swift in Sources */,
 				801E3C702A9C657B0049CC7E /* PomowatchApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
